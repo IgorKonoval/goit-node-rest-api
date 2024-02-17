@@ -6,13 +6,13 @@ const contactsPath = path.join(__dirname, "..", "db", "contacts.json");
 
 async function listContacts() {
   const data = await fs.readFile(contactsPath, { encoding: "utf-8" });
-  console.log(data);
   return JSON.parse(data);
 }
 
 async function getContactById(contactId) {
   const contacts = await listContacts();
   const findContact = contacts.find((contact) => contact.id === contactId);
+  console.log(findContact);
   return findContact || null;
 }
 
@@ -38,6 +38,7 @@ async function addContact(body) {
   };
   contacts.push(newContact);
   await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+  console.log(newContact);
   return newContact;
 }
 
