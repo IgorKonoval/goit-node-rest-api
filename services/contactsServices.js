@@ -1,6 +1,7 @@
 const fs = require("node:fs/promises");
 const path = require("node:path");
 const crypto = require("node:crypto");
+const { HttpError } = require("../helpers/HttpError.js");
 
 const contactsPath = path.join(__dirname, "..", "db", "contacts.json");
 
@@ -32,14 +33,18 @@ async function removeContact(contactId) {
 
 async function addContact(body) {
   const contacts = await listContacts();
-  const newContact = {
-    id: crypto.randomUUID(),
-    ...body,
-  };
-  contacts.push(newContact);
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-  console.log(newContact);
-  return newContact;
+  const findContact = contacts.find((contact) => contact.name === body.name);
+  if (!findContact) {
+    const newContact = {
+      id: crypto.randomUUID(),
+      ...body,
+    };
+    contacts.push(newContact);
+    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+    console.log(newContact);
+    return newContact;
+  }
+  throw HttpError(409, "Contact already exists");
 }
 
 async function updContact(id, body) {

@@ -52,20 +52,6 @@ const deleteContact = async (req, res, next) => {
   }
 };
 
-// const createContact = async (req, res, next) => {
-//   try {
-//     validateBody(createContactSchema)(req, res, async () => {
-//       const result = await addContact(req.body);
-//       if (result.name === req.body.name) {
-//         throw HttpError(409, "Contact already exists");
-//       }
-//       res.status(201).json(result);
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
 const createContact = async (req, res, next) => {
   try {
     const { error } = createContactSchema.validate(req.body);
@@ -73,9 +59,6 @@ const createContact = async (req, res, next) => {
       throw HttpError(400, error.message);
     }
     const result = await addContact(req.body);
-    if (result.name === req.body.name) {
-      throw HttpError(409, "Contact already exists");
-    }
     res.status(201).json(result);
   } catch (error) {
     next(error);
