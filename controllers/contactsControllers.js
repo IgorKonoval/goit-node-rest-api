@@ -10,7 +10,6 @@ const {
   createContactSchema,
 } = require("../schemas/contactsSchemas.js");
 const { HttpError } = require("../helpers/HttpError.js");
-const { validateBody } = require("../helpers/validateBody.js");
 
 const getAllContacts = async (req, res, next) => {
   try {
