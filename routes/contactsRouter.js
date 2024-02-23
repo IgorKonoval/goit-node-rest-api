@@ -1,22 +1,34 @@
 const express = require("express");
-const {
-  getAllContacts,
-  getOneContact,
-  deleteContact,
-  createContact,
-  updateContact,
-} = require("../controllers/contactsControllers.js");
+const control = require("../controllers/contactsControllers.js");
+const { validateId, validateBody } = require("../helpers/index.js");
+const { schema } = require("../models/contacts.js");
 
 const contactsRouter = express.Router();
 
-contactsRouter.get("/", getAllContacts);
+contactsRouter.get("/", control.getAllContacts);
 
-contactsRouter.get("/:id", getOneContact);
+contactsRouter.get("/:id", validateId, control.getOneContact);
 
-contactsRouter.delete("/:id", deleteContact);
+contactsRouter.post(
+  "/",
+  validateBody(schema.createContactSchema),
+  control.createContact
+);
 
-contactsRouter.post("/", createContact);
+contactsRouter.put(
+  "/:id",
+  validateId,
+  validateBody(schema.updateContactSchema),
+  control.updateContact
+);
 
-contactsRouter.put("/:id", updateContact);
+contactsRouter.delete("/:id", validateId, control.deleteContact);
+
+contactsRouter.patch(
+  "/:id/favorite",
+  validateId,
+  validateBody(schema.favoriteSchema),
+  control.updateStatusContact
+);
 
 module.exports = contactsRouter;
