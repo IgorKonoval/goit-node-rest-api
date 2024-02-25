@@ -3,7 +3,6 @@ const { HttpError, ctrlWrapper } = require("../helpers");
 
 const registerUser = async (req, res) => {
   const { password, email } = req.body;
-
   const user = await User.findOne({ email });
 
   if (user) {
