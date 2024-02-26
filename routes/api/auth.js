@@ -1,5 +1,5 @@
 const express = require("express");
-const { registerUser } = require("../../controllers/auth.js");
+const ctrl = require("../../controllers/auth.js");
 const { schema } = require("../../models/users.js");
 const { validateBody } = require("../../helpers");
 
@@ -7,9 +7,9 @@ const { validateBody } = require("../../helpers");
 
 const authRouter = express.Router();
 
-authRouter.post("/register", validateBody(schema.schemaRegLog), registerUser);
+authRouter.post("/register", validateBody(schema.schemaRegLog), ctrl.register);
 
-authRouter.post("/login");
+authRouter.post("/login", validateBody(schema.schemaRegLog), ctrl.login);
 
 authRouter.post("/logout");
 

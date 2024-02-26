@@ -33,8 +33,15 @@ const userSchema = Schema(
 const User = model("user", userSchema);
 
 const schemaRegLog = Joi.object({
-  password: Joi.string().min(6).required(),
-  email: Joi.string().pattern(emailRegex).required(),
+  password: Joi.string().min(6).required().messages({
+    "string.min": "Minimum password length of 6 characters",
+    "string.empty": "Password cannot be empty",
+    "any.required": "Missing password field",
+  }),
+  email: Joi.string().pattern(emailRegex).required().messages({
+    "string.pattern.base": "Invalid email format",
+    "any.required": "Missing email field",
+  }),
 });
 
 const schema = {
