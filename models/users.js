@@ -2,6 +2,8 @@ const { Schema, model } = require("mongoose");
 
 const Joi = require("joi");
 
+const handleMongooseError = require("../helpers/handleMongooseError");
+
 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
 const userSchema = Schema(
@@ -29,6 +31,7 @@ const userSchema = Schema(
   },
   { versionKey: false, timestamps: true }
 );
+userSchema.post("save", handleMongooseError);
 
 const User = model("user", userSchema);
 

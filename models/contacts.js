@@ -2,6 +2,8 @@ const { Schema, model } = require("mongoose");
 
 const Joi = require("joi");
 
+const handleMongooseError = require("../helpers/handleMongooseError");
+
 const regexName = /^[A-Za-zА-Яа-я]+ [A-Za-zА-Яа-я]+$/;
 const regexPhoneNumber = /\(?([0-9]{3})\)?([ -]?)([0-9]{3})\2([0-9]{4})/;
 const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -33,6 +35,7 @@ const contactSchema = Schema(
   },
   { versionKey: false, timestamps: true }
 );
+contactSchema.post("save", handleMongooseError);
 
 const Contact = model("contact", contactSchema);
 
