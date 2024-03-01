@@ -1,0 +1,106 @@
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+
+const { User } = require("../models/users.js");
+const { HttpError, ctrlWrapper } = require("../helpers");
+
+const { SECRET_KEY } = process.env;
+
+const register = async (req, res) => {
+  const { password, email } = req.body;
+  const lowerCaseEmail = email.toLowerCase();
+
+  const user = await User.findOne({ email: lowerCaseEmail });
+
+  if (user) {
+    throw HttpError(409, "Email in use");
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const newUser = await User.create({
+    ...req.body,
+    email: lowerCaseEmail,
+    password: hashedPassword,
+  });
+
+  res.status(201).json({
+    user: {
+      email: newUser.email,
+      subscription: newUser.subscription,
+    },
+  });
+};
+
+const login = async (req, res) => {
+  const { password, email } = req.body;
+  const lowerCaseEmail = email.toLowerCase();
+
+  const user = await User.findOne({ email: lowerCaseEmail });
+
+  if (!user) {
+    throw HttpError(401, "Email or password is wrong");
+  }
+
+  const passCompare = await bcrypt.compare(password, user.password);
+
+  if (!passCompare) {
+    throw HttpError(401, "Email or password is wrong");
+  }
+
+  const payload = {
+    id: user._id,
+  };
+  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
+
+  await User.findByIdAndUpdate(user._id, { token });
+
+  res.status(200).json({
+    token,
+    user: {
+      email: user.email,
+      subscription: user.subscription,
+    },
+  });
+};
+
+const logout = async (req, res) => {
+  const { _id } = req.user;
+  const result = await User.findByIdAndUpdate(_id, { token: null });
+
+  if (!result) {
+    throw HttpError(401, "Not authorized");
+  }
+
+  res.status(204).json({});
+};
+
+const getCurrent = async (req, res) => {
+  const { email, subscription } = req.user;
+
+  res.status(200).json({
+    email,
+    subscription,
+  });
+};
+
+const updateSubscription = async (req, res) => {
+  const { _id } = req.user;
+  const user = await User.findById(_id);
+
+  if (!user) {
+    throw HttpError(404, "Not found");
+  }
+
+  user.subscription = req.body.subscription;
+  await user.save();
+  res.json(user);
+};
+
+module.exports = {
+  register: ctrlWrapper(register),
+  login: ctrlWrapper(login),
+  logout: ctrlWrapper(logout),
+  getCurrent: ctrlWrapper(getCurrent),
+  updateSubscription: ctrlWrapper(updateSubscription),
+};

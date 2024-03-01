@@ -1,4 +1,4 @@
-const HttpError = require("./HttpError.js");
+const { HttpError } = require("../helpers");
 const { schema } = require("../models/contacts.js");
 
 const validateId = (req, res, next) => {
@@ -11,4 +11,4 @@ const validateId = (req, res, next) => {
   next();
 };
 
-module.exports = { validateId };
+module.exports = validateId;
