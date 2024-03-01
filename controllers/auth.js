@@ -57,11 +57,50 @@ const login = async (req, res) => {
 
   res.status(200).json({
     token,
-    user: { email: user.email, subscription: user.subscription },
+    user: {
+      email: user.email,
+      subscription: user.subscription,
+    },
   });
+};
+
+const logout = async (req, res) => {
+  const { _id } = req.user;
+  const result = await User.findByIdAndUpdate(_id, { token: null });
+
+  if (!result) {
+    throw HttpError(401, "Not authorized");
+  }
+
+  res.status(204).json({});
+};
+
+const getCurrent = async (req, res) => {
+  const { email, subscription } = req.user;
+
+  res.status(200).json({
+    email,
+    subscription,
+  });
+};
+
+const updateSubscription = async (req, res) => {
+  const { _id } = req.user;
+  const user = await User.findById(_id);
+
+  if (!user) {
+    throw HttpError(404, "Not found");
+  }
+
+  user.subscription = req.body.subscription;
+  await user.save();
+  res.json(user);
 };
 
 module.exports = {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
+  logout: ctrlWrapper(logout),
+  getCurrent: ctrlWrapper(getCurrent),
+  updateSubscription: ctrlWrapper(updateSubscription),
 };
