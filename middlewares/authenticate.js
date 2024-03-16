@@ -22,6 +22,9 @@ const authenticate = async (req, res, next) => {
     if (!user || !user.token || user.token !== token) {
       next(HttpError(401, "Not authorized"));
     }
+    if (!user.verify) {
+      next(HttpError(401, "Your account is not verified"));
+    }
 
     req.user = user;
     next();
